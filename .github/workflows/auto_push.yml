@@ -1,0 +1,33 @@
+name: Auto Commit and Push
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  commit-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+      - name: Make changes (if any)
+        run: |
+          echo "# Auto Update" >> README.md
+          git add .
+          git diff --staged --quiet || git commit -m "Auto commit from GitHub Action"
+
+      - name: Push changes
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          git remote set-url origin https://x-access-token:${GH_PAT}@github.com/JunnaidJunnu/AgenticAI.git
+          git push origin main
